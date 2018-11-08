@@ -9,12 +9,12 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = int(1e6)  # replay buffer size
-BATCH_SIZE = 64         # minibatch size
+BUFFER_SIZE = int(1e4)  # replay buffer size
+BATCH_SIZE = 128         # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
-LR_CRITIC = 3e-4        # learning rate of the critic
+LR_CRITIC = 1e-4        # learning rate of the critic
 WEIGHT_DECAY = 0.0001   # L2 weight decay
 
 N_LEARN_UPDATES = 10    # number of learning samples
@@ -54,7 +54,10 @@ class Agent():
 
         # Replay memory - only intitialise once per class
         if Agent.memory is None:
+            print("Initialising ReplayBuffer")
             Agent.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, random_seed)
+        else:
+            print("Sharing ReplayBuffer %s", Agent.memory)
 
     def step(self, time_step, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
@@ -62,7 +65,7 @@ class Agent():
         Agent.memory.add(state, action, reward, next_state, done)
 
         # only learn every n_time_steps
-        if not time_step % N_TIME_STEPS:
+        if time_step % N_TIME_STEPS:
             return
 
         # Learn, if enough samples are available in memory
