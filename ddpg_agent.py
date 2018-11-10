@@ -17,7 +17,7 @@ LR_ACTOR = 1e-4         # learning rate of the actor
 LR_CRITIC = 1e-4        # learning rate of the critic
 WEIGHT_DECAY = 0.0      # L2 weight decay
 
-N_LEARN_UPDATES = 5     # number of learning updates
+N_LEARN_UPDATES = 8     # number of learning updates
 N_TIME_STEPS = 20       # every n time step do update
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -94,7 +94,7 @@ class Agent():
         Agent.memory.add(state, action, reward, next_state, done)
 
         # only learn every n_time_steps
-        if time_step % N_TIME_STEPS:
+        if time_step % N_TIME_STEPS != 0:
             return
 
         # Learn, if enough samples are available in memory
@@ -142,7 +142,7 @@ class Agent():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
+        #torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
         self.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
